@@ -8,4 +8,4 @@ fi
 
 RELEASE_BRANCH="$1"
 
-/usr/app/auto-semver-tag exec "${GITHUB_REPOSITORY}" "${RELEASE_BRANCH}" "${GITHUB_SHA}" "${GITHUB_EVENT_PATH}"
+/auto-semver-tag exec "${GITHUB_REPOSITORY}" "${RELEASE_BRANCH}" "${GITHUB_SHA}" "${GITHUB_EVENT_PATH}"
