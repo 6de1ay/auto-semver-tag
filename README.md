@@ -1,3 +1,3 @@
 # Auto semver tag
 
-Actions automatically creates semver tag on pull request merge
+Action automatically creates semver tag on pull request merge
