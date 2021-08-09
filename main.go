@@ -34,7 +34,7 @@ func executeCommand(cmd *cobra.Command, args []string) {
 	commitSha := args[2]
 	githubEventFilePath := args[3]
 
-	token, isExists := os.LookupEnv("GTIHUB_TOKEN")
+	token, isExists := os.LookupEnv("GITHUB_TOKEN")
 	if !isExists {
 		panic("token does not exists")
 	}
