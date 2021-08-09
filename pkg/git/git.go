@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -62,19 +63,19 @@ func (gitClient *GitClient) PerformAction(commitSha string, eventDataFilePath st
 	event := parseEventDataFile(eventDataFilePath)
 
 	if event.Action == nil || *event.Action != "closed" {
-		panic("pull request is not closed")
+		log.Fatal("pull request is not closed")
 	}
 
 	if event.PullRequest.Merged == nil || !*event.PullRequest.Merged {
-		panic("pull request is not merged")
+		log.Fatal("pull request is not merged")
 	}
 
 	if event.PullRequest.Base == nil || event.PullRequest.Base.Ref == nil {
-		panic("could not determine pull request base branch")
+		log.Fatal("could not determine pull request base branch")
 	}
 
 	if *event.PullRequest.Base.Ref != gitClient.repo.releaseBranch {
-		panic("pull request is merged not into the release branch")
+		log.Fatal("pull request is merged not into the release branch")
 	}
 
 	incrementType := getIncrementTypeFromLabels(event.PullRequest)
@@ -134,19 +135,23 @@ func getIncrementTypeFromLabels(pr *github.PullRequest) string {
 func parseEventDataFile(filePath string) *github.PullRequestEvent {
 	file, err := os.Open(filePath)
 	if err != nil {
-		panic(err)
+		log.Fatalf("%s. Filepath: %s", err, filePath)
 	}
 	defer file.Close()
 
 	event, err := ioutil.ReadAll(file)
 	if err != nil {
-		panic(err)
+		log.Fatalf("%s. Filepath: %s", err, filePath)
 	}
 
 	eventData, err := github.ParseWebHook("pull_request", stripOrg(event))
+	if err != nil {
+		log.Fatalf("%s. Filepath: %s", err, filePath)
+	}
+
 	res, ok := eventData.(*github.PullRequestEvent)
 	if !ok {
-		panic("could not parse GitHub event into a PullRequestEvent")
+		log.Fatal("could not parse GitHub event into a PullRequestEvent")
 	}
 
 	return res
@@ -160,7 +165,7 @@ func getLatestTag(client *github.Client, owner string, repo string) semver.SemVe
 		Ref: "tags",
 	})
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	if response != nil && response.StatusCode == http.StatusNotFound {
