@@ -30,7 +30,7 @@ func command() *cobra.Command {
 }
 
 func executeCommand(cmd *cobra.Command, args []string) {
-	reposiroy := args[0]
+	repository := args[0]
 	releaseBranch := args[1]
 	commitSha := args[2]
 	githubEventFilePath := args[3]
@@ -40,6 +40,6 @@ func executeCommand(cmd *cobra.Command, args []string) {
 		log.Fatal("GITHUB_TOKEN env var does not exist")
 	}
 
-	client := git.New(token, reposiroy, releaseBranch)
+	client := git.New(token, repository, releaseBranch)
 	client.PerformAction(commitSha, githubEventFilePath)
 }
