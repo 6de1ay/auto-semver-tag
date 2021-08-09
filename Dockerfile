@@ -15,4 +15,4 @@ FROM alpine:latest
 COPY entrypoint.sh /entrypoint.sh
 COPY --from=build /usr/app/auto-semver-tag /auto-semver-tag
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["sh", "/entrypoint.sh"]

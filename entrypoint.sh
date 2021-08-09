@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -l
 
 if [ -z "${GITHUB_TOKEN}" ]
 then
