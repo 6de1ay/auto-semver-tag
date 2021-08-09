@@ -12,9 +12,7 @@ RUN go build -o auto-semver-tag
 # Runtime
 FROM alpine:latest
 
-WORKDIR /usr/app
+COPY entrypoint.sh /entrypoint.sh
+COPY --from=build /usr/app/auto-semver-tag /auto-semver-tag
 
-COPY entrypoint.sh /usr/app/entrypoint.sh
-COPY --from=build /usr/app/auto-semver-tag /usr/app/auto-semver-tag
-
-ENTRYPOINT ["/usr/app/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
