@@ -78,8 +78,20 @@ func (gitClient *GitClient) PerformAction(commitSha string, eventDataFilePath st
 		log.Fatal("pull request is merged not into the release branch")
 	}
 
-	incrementType := getIncrementTypeFromLabels(event.PullRequest)
-	newVersion := gitClient.repo.version.IncrementVersion(incrementType)
+	hasMajor, hasMinor := parsePullRequestLabels(event.PullRequest)
+
+	var newVersion semver.SemVer
+	if hasMajor {
+		newVersion = gitClient.repo.version.IncrementVersion(semver.IncrementTypeMajor)
+	} else if hasMinor {
+		newVersion = gitClient.repo.version.IncrementVersion(semver.IncrementTypeMinor)
+	} else {
+		newVersion = gitClient.repo.version.IncrementVersion(semver.IncrementTypePatch)
+	}
+
+	if !newVersion.IsGreaterThan(semver.SemVer{}) {
+		log.Fatal("new version is 0.0.0")
+	}
 
 	err := gitClient.createTag(newVersion.String(), commitSha)
 	if err != nil {
@@ -101,27 +113,25 @@ func (gitClient *GitClient) createTag(version string, commitSha string) error {
 	return err
 }
 
-func getIncrementTypeFromLabels(pr *github.PullRequest) string {
-	incrementType := semver.DefaultIncrementType
-
+func parsePullRequestLabels(pr *github.PullRequest) (hasMajor bool, hasMinor bool) {
 	for _, label := range pr.Labels {
 		if label.Name == nil {
 			continue
 		}
 
 		if *label.Name == IncrementTypeMajorLabel {
-			incrementType = semver.IncrementTypeMajor
-			break
+			hasMajor = true
+			continue
 		}
 
 		if *label.Name == IncrementTypeMinorLabel {
-			incrementType = semver.IncrementTypeMinor
+			hasMinor = true
 			continue
 		}
 
 	}
 
-	return incrementType
+	return
 }
 
 func parseEventDataFile(filePath string) *github.PullRequestEvent {

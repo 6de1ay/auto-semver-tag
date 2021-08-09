@@ -13,8 +13,6 @@ const (
 	IncrementTypeMajor = "major"
 	IncrementTypeMinor = "minor"
 	IncrementTypePatch = "patch"
-
-	DefaultIncrementType = IncrementTypePatch
 )
 
 type SemVer struct {
