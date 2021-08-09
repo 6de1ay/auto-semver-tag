@@ -17,4 +17,4 @@ WORKDIR /usr/app
 COPY entrypoint.sh /usr/app/entrypoint.sh
 COPY --from=build /usr/app/auto-semver-tag /usr/app/auto-semver-tag
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/usr/app/entrypoint.sh"]
