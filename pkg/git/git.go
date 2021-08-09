@@ -81,7 +81,10 @@ func (gitClient *GitClient) PerformAction(commitSha string, eventDataFilePath st
 	incrementType := getIncrementTypeFromLabels(event.PullRequest)
 	newVersion := gitClient.repo.version.IncrementVersion(incrementType)
 
-	gitClient.createTag(newVersion.String(), commitSha)
+	err := gitClient.createTag(newVersion.String(), commitSha)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func (gitClient *GitClient) createTag(version string, commitSha string) error {
@@ -109,7 +112,7 @@ func getIncrementTypeFromLabels(pr *github.PullRequest) string {
 
 		if *label.Name == IncrementTypeMajorLabel {
 			if isValidLabelFound {
-				panic("several valid labels found")
+				log.Fatal("several valid labels found")
 			}
 
 			isValidLabelFound = true
@@ -119,7 +122,7 @@ func getIncrementTypeFromLabels(pr *github.PullRequest) string {
 
 		if *label.Name == IncrementTypeMinorLabel {
 			if isValidLabelFound {
-				panic("several valid labels found")
+				log.Fatal("several valid labels found")
 			}
 
 			isValidLabelFound = true

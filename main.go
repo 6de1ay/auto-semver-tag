@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 
 	"github.com/6de1ay/auto-semver-tag/pkg/git"
@@ -36,7 +37,7 @@ func executeCommand(cmd *cobra.Command, args []string) {
 
 	token, isExists := os.LookupEnv("GITHUB_TOKEN")
 	if !isExists {
-		panic("token does not exists")
+		log.Fatal("GITHUB_TOKEN env var does not exist")
 	}
 
 	client := git.New(token, reposiroy, releaseBranch)
