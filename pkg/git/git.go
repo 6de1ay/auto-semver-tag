@@ -102,7 +102,6 @@ func (gitClient *GitClient) createTag(version string, commitSha string) error {
 }
 
 func getIncrementTypeFromLabels(pr *github.PullRequest) string {
-	isValidLabelFound := false
 	incrementType := semver.DefaultIncrementType
 
 	for _, label := range pr.Labels {
@@ -111,21 +110,11 @@ func getIncrementTypeFromLabels(pr *github.PullRequest) string {
 		}
 
 		if *label.Name == IncrementTypeMajorLabel {
-			if isValidLabelFound {
-				log.Fatal("several valid labels found")
-			}
-
-			isValidLabelFound = true
 			incrementType = semver.IncrementTypeMajor
-			continue
+			break
 		}
 
 		if *label.Name == IncrementTypeMinorLabel {
-			if isValidLabelFound {
-				log.Fatal("several valid labels found")
-			}
-
-			isValidLabelFound = true
 			incrementType = semver.IncrementTypeMinor
 			continue
 		}
