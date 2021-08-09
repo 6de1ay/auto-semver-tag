@@ -16,8 +16,8 @@ import (
 )
 
 const (
-	IncrementTypeMajorLabel = "Major"
-	IncrementTypeMinorLabel = "Minor"
+	IncrementTypeMajorLabel = "major"
+	IncrementTypeMinorLabel = "minor"
 )
 
 type GitRepository struct {
