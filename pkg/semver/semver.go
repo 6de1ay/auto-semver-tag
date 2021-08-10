@@ -8,7 +8,11 @@ import (
 )
 
 const (
-	SemVerRegExp = `^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)`
+	// https://ihateregex.io/expr/semver
+	SemVerRegExp = `^v?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)` +
+		`(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)` +
+		`(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?` +
+		`(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$`
 
 	IncrementTypeMajor = "major"
 	IncrementTypeMinor = "minor"
@@ -32,8 +36,11 @@ func New(semVer string) (SemVer, error) {
 		return newInvalidSemVerError(semVer)
 	}
 
-	// semVer[1:] because the first symbol is 'v'
-	parts := strings.SplitN(semVer[1:], ".", 3)
+	if strings.Index(semVer, "v") == 0 {
+		semVer = semVer[1:]
+	}
+
+	parts := strings.SplitN(semVer, ".", 3)
 
 	major, err := strconv.ParseUint(parts[0], 10, 64)
 	if err != nil {
@@ -45,7 +52,17 @@ func New(semVer string) (SemVer, error) {
 		return newInvalidSemVerError(semVer)
 	}
 
-	patch, err := strconv.ParseUint(parts[2], 10, 64)
+	patchStr := parts[2]
+
+	if buildIndex := strings.IndexRune(patchStr, '+'); buildIndex != -1 {
+		patchStr = patchStr[:buildIndex]
+	}
+
+	if preIndex := strings.IndexRune(patchStr, '-'); preIndex != -1 {
+		patchStr = patchStr[:preIndex]
+	}
+
+	patch, err := strconv.ParseUint(patchStr, 10, 64)
 	if err != nil {
 		return newInvalidSemVerError(semVer)
 	}
